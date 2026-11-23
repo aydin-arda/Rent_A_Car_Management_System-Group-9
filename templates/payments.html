@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Payment management</h1>
+<p class="muted">Only administrators can manage payments. Each booking can have at most one payment record.</p>
+
+<div class="card">
+  <h3>Payment records</h3>
+  <table>
+    <tr><th>ID</th><th>Booking</th><th>Customer</th><th>Vehicle</th><th>Date</th><th>Amount (TRY)</th><th>Method</th><th>Status</th><th>Actions</th></tr>
+    {% for p in payments %}
+    <tr>
+      <td>{{ p.payment_id }}</td><td>#{{ p.booking_id }}</td><td>{{ p.customer }}</td><td>{{ p.vehicle }}</td>
+      <td>{{ p.payment_date }}</td><td>{{ p.amount }}</td><td>{{ p.payment_method }}</td><td>{{ p.payment_status }}</td>
+      <td>
+        <details>
+          <summary class="btn">Edit</summary>
+          <form method="post" action="{{ url_for('update_payment', payment_id=p.payment_id) }}" class="formgrid">
+            <label>Date</label><input type="date" name="payment_date" value="{{ p.payment_date }}" required>
+            <input type="number" name="amount" min="0.01" step="0.01" value="{{ p.amount }}" required>
+            <select name="payment_method">
+              {% for m in ['CARD','CASH','BANK_TRANSFER'] %}<option value="{{ m }}" {% if m==p.payment_method %}selected{% endif %}>{{ m }}</option>{% endfor %}
+            </select>
+            <select name="payment_status">
+              {% for s in ['PAID','PENDING','REFUNDED'] %}<option value="{{ s }}" {% if s==p.payment_status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+            <button>Save changes</button>
+          </form>
+        </details>
+        <form class="inline" method="post" action="{{ url_for('delete_payment', payment_id=p.payment_id) }}" onsubmit="return confirm('Delete this payment record?')">
+          <button class="danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9" class="muted">No payment records found.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h3>Add payment</h3>
+  {% if bookings %}
+  <form method="post" action="{{ url_for('add_payment') }}" class="formgrid">
+    <select name="booking_id" required>
+      {% for b in bookings %}<option value="{{ b.booking_id }}">Booking #{{ b.booking_id }} — {{ b.customer }} — {{ b.vehicle }} ({{ b.total_amount }} TRY)</option>{% endfor %}
+    </select>
+    <label>Payment date</label><input type="date" name="payment_date" required>
+    <input type="number" name="amount" min="0.01" step="0.01" placeholder="Amount (TRY)" required>
+    <select name="payment_method"><option value="CARD">CARD</option><option value="CASH">CASH</option><option value="BANK_TRANSFER">BANK_TRANSFER</option></select>
+    <select name="payment_status"><option value="PAID">PAID</option><option value="PENDING">PENDING</option><option value="REFUNDED">REFUNDED</option></select>
+    <button>Add payment</button>
+  </form>
+  {% else %}
+  <p class="muted">All existing bookings already have a payment record, or there are no bookings available.</p>
+  {% endif %}
+</div>
+{% endblock %}

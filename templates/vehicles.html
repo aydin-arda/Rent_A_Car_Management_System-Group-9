@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}<h1>Vehicle inventory</h1>
+<div class="card"><table><tr><th>ID</th><th>Vehicle</th><th>Plate</th><th>Branch</th><th>Rate/day</th><th>Status</th>{% if session.role=='ADMIN' %}<th>Admin actions</th>{% endif %}</tr>
+{% for v in vehicles %}<tr><td>{{v.vehicle_id}}</td><td>{{v.brand}} {{v.model}} ({{v.model_year}})</td><td>{{v.plate_no}}</td><td>{{v.branch_name}}</td><td>{{v.daily_rate}}</td><td>{{v.status}}</td>
+{% if session.role=='ADMIN' %}<td><form class="inline" method="post" action="{{url_for('update_vehicle',vehicle_id=v.vehicle_id)}}">
+<select name="branch_id">{% for b in branches %}<option value="{{b.branch_id}}" {% if b.branch_id==v.branch_id %}selected{% endif %}>{{b.branch_name}}</option>{% endfor %}</select>
+<input name="daily_rate" type="number" min="1" step="0.01" value="{{v.daily_rate}}" style="width:85px">
+<select name="status">{% for s in ['AVAILABLE','RENTED','MAINTENANCE','INACTIVE'] %}<option {% if s==v.status %}selected{% endif %}>{{s}}</option>{% endfor %}</select><button>Update</button></form>
+<form class="inline" method="post" action="{{url_for('delete_vehicle',vehicle_id=v.vehicle_id)}}" onsubmit="return confirm('Delete this vehicle?')"><button class="danger">Delete</button></form></td>{% endif %}</tr>{% endfor %}</table></div>
+{% if session.role=='ADMIN' %}<div class="card"><h3>Add vehicle</h3><form method="post" action="{{url_for('add_vehicle')}}" class="formgrid">
+<select name="branch_id">{% for b in branches %}<option value="{{b.branch_id}}">{{b.branch_name}}</option>{% endfor %}</select>
+<input name="plate_no" placeholder="Plate number" required><input name="brand" placeholder="Brand" required><input name="model" placeholder="Model" required>
+<input name="model_year" type="number" placeholder="Year" required><select name="category"><option>ECONOMY</option><option>SEDAN</option><option>SUV</option><option>HATCHBACK</option><option>LUXURY</option></select>
+<select name="transmission"><option>AUTOMATIC</option><option>MANUAL</option></select><input name="daily_rate" type="number" min="1" step=".01" placeholder="Daily rate" required>
+<select name="status"><option>AVAILABLE</option><option>MAINTENANCE</option><option>INACTIVE</option></select><button>Add vehicle</button></form></div>{% endif %}{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}
+<h1>Dashboard</h1><p class="muted">Signed in as {{session.username}} ({{session.role}})</p>
+<div class="grid"><div class="card"><div>Available vehicles</div><div class="stat">{{available}}</div></div><div class="card"><div>Total bookings</div><div class="stat">{{bookings}}</div></div><div class="card"><div>Registered customers</div><div class="stat">{{customers}}</div></div></div>
+<div class="card"><h3>System overview</h3><p>Manage fleet availability, rental requests, customers and booking status from one place.</p>
+<a class="btn" href="{{url_for('vehicles')}}">View vehicles</a> <a class="btn" href="{{url_for('bookings')}}">Manage bookings</a></div>{% endblock %}

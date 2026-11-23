@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Customer management</h1>
+<p class="muted">Only administrators can access this page. Customers with existing bookings cannot be deleted.</p>
+<div class="card">
+  <h3>Registered customers</h3>
+  <table>
+    <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Driver license</th><th>License expiry</th><th>Actions</th></tr>
+    {% for c in customers %}
+    <tr>
+      <td>{{ c.customer_id }}</td>
+      <td>{{ c.first_name }} {{ c.last_name }}</td>
+      <td>{{ c.email }}</td>
+      <td>{{ c.phone }}</td>
+      <td>{{ c.driver_license_no }}</td>
+      <td>{{ c.license_expiry }}</td>
+      <td>
+        <details>
+          <summary class="btn">Edit</summary>
+          <form method="post" action="{{ url_for('update_customer', customer_id=c.customer_id) }}" class="formgrid">
+            <input name="first_name" value="{{ c.first_name }}" placeholder="First name" required maxlength="60">
+            <input name="last_name" value="{{ c.last_name }}" placeholder="Last name" required maxlength="60">
+            <input name="email" type="email" value="{{ c.email }}" placeholder="Email" required maxlength="120">
+            <input name="phone" value="{{ c.phone }}" placeholder="Phone" required maxlength="25">
+            <input name="driver_license_no" value="{{ c.driver_license_no }}" placeholder="Driver license no." required maxlength="40">
+            <input name="license_expiry" type="date" value="{{ c.license_expiry }}" required>
+            <button>Save changes</button>
+          </form>
+        </details>
+        <form class="inline" method="post" action="{{ url_for('delete_customer', customer_id=c.customer_id) }}" onsubmit="return confirm('Delete this customer? Customers with bookings cannot be deleted.')">
+          <button class="danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="muted">No customers registered.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h3>Add customer</h3>
+  <form method="post" action="{{ url_for('add_customer') }}" class="formgrid">
+    <input name="first_name" placeholder="First name" required maxlength="60">
+    <input name="last_name" placeholder="Last name" required maxlength="60">
+    <input name="email" type="email" placeholder="Email" required maxlength="120">
+    <input name="phone" placeholder="Phone" required maxlength="25">
+    <input name="driver_license_no" placeholder="Driver license number" required maxlength="40">
+    <label>License expiry</label><input name="license_expiry" type="date" required>
+    <button>Add customer</button>
+  </form>
+</div>
+{% endblock %}

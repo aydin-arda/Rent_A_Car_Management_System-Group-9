@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block content %}<h1>Bookings</h1><div class="card"><table><tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Pickup</th><th>Return</th><th>Status</th><th>Total (TRY)</th>{% if session.role=='ADMIN' %}<th>Update status</th>{% endif %}</tr>
+{% for b in bookings %}<tr><td>{{b.booking_id}}</td><td>{{b.customer}}</td><td>{{b.vehicle}}</td><td>{{b.pickup_date}}</td><td>{{b.return_date}}</td><td>{{b.booking_status}}</td><td>{{b.total_amount}}</td>
+{% if session.role=='ADMIN' %}<td><form method="post" action="{{url_for('update_booking_status',booking_id=b.booking_id)}}"><select name="booking_status">{% for s in ['PENDING','CONFIRMED','COMPLETED','CANCELLED'] %}<option {% if s==b.booking_status %}selected{% endif %}>{{s}}</option>{% endfor %}</select><button>Save</button></form></td>{% endif %}</tr>{% endfor %}</table></div>
+<div class="card"><h3>Create booking request</h3><form method="post" action="{{url_for('add_booking')}}" class="formgrid">
+{% if session.role=='ADMIN' %}<select name="customer_id">{% for c in customers %}<option value="{{c.customer_id}}">{{c.first_name}} {{c.last_name}}</option>{% endfor %}</select>{% endif %}
+<select name="vehicle_id" required>{% for v in vehicles %}<option value="{{v.vehicle_id}}">{{v.brand}} {{v.model}} — {{v.daily_rate}} TRY/day</option>{% endfor %}</select>
+<select name="pickup_branch_id">{% for b in branches %}<option value="{{b.branch_id}}">{{b.branch_name}}</option>{% endfor %}</select>
+<select name="return_branch_id">{% for b in branches %}<option value="{{b.branch_id}}">{{b.branch_name}}</option>{% endfor %}</select>
+<label>Pickup</label><input type="date" name="pickup_date" required><label>Return</label><input type="date" name="return_date" required><button>Create request</button></form>
+<p class="muted">Customers can create requests for their own profile. Administrators can create requests for any customer.</p></div>{% endblock %}
